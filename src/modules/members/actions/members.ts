@@ -38,6 +38,11 @@ export async function getMembers(withExternalMembers = false): Promise<MiembroRe
   return res.data;
 }
 
+export async function getBirthdays(month: number): Promise<MiembroResponse[]> {
+  const res = await axiosInstance.get<MiembroResponse[]>(`${baseEndpoint}/cumpleanos/${month}`);
+  return res.data;
+}
+
 export async function getMemberById(id: number): Promise<MiembroResponse> {
   const res = await axiosInstance.get<MiembroResponse>(`${baseEndpoint}/${id}`);
   return res.data;

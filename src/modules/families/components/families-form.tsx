@@ -6,9 +6,9 @@ import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { familySchema, FamilySchemaType } from "../schemas/family.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { useMembers } from "@/modules/members/hooks/useMembersGet";
 import { SelectField } from "@/components/form/select-field";
-import { useEffect } from "react";
+import { useDeferredValue, useEffect, useState } from "react";
+import { useMembersPaginated } from "@/modules/members/hooks/useMembersGet";
 import { useCreateMember } from "@/modules/members/hooks/useMembersCreate";
 import { SexoEnum } from "@/modules/members/types/enums";
 import { FamiliaCreate, FamiliaMiembroCreate } from "../types/families.types";
@@ -47,7 +47,18 @@ const FamiliesForm = ({ mode, id, setOpen }: MembersFormProps) => {
     useCreateFamily();
   const { mutateAsync: updateFamilyFn, isPending: isPendingUpdateFamily } =
     useUpdateFamily();
-  const { data: members, isPending: isPendingMembers } = useMembers(true);
+  const [memberSearch, setMemberSearch] = useState("");
+  const deferredMemberSearch = useDeferredValue(memberSearch);
+  const { data: membersPage, isPending: isPendingMembers } = useMembersPaginated({
+    page: 1,
+    page_size: 50,
+    order_by: "apellidos",
+    order_dir: "asc",
+    filters: deferredMemberSearch
+      ? { nombre: deferredMemberSearch }
+      : undefined,
+  });
+  const members = membersPage?.data;
   const { data: family, isLoading: isLoadingFamily } = useFamilyById(id);
   useEffect(() => {
     if (mode === "edit" && family) {
@@ -225,6 +236,7 @@ const FamiliesForm = ({ mode, id, setOpen }: MembersFormProps) => {
               name={`miembros_familia.${index}.miembro_id`}
               options={membersToSelect ?? []}
               isLoading={isPendingMembers}
+              onSearchChange={setMemberSearch}
               onValueChange={(value) =>
                 handleSelectMiembro(index, Number(value))
               }

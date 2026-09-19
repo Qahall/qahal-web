@@ -56,6 +56,7 @@ type SelectFieldProps<
   disabled?: boolean;
   isLoading?: boolean;
   onValueChange?: (value: string) => void;
+    onSearchChange?: (value: string) => void;
 } & Omit<
   React.ComponentProps<typeof Button>,
   "name" | "value" | "defaultValue" | "onChange" | "onBlur" | "disabled"
@@ -75,6 +76,7 @@ export function SelectField<
   isLoading = false,
   id,
   onValueChange,
+  onSearchChange,
   className,
   variant = "outline",
   size,
@@ -149,7 +151,10 @@ export function SelectField<
                   align="start"
                 >
                   <Command>
-                    <CommandInput placeholder="Buscar..." />
+                    <CommandInput
+                      placeholder="Buscar..."
+                      onValueChange={onSearchChange}
+                    />
                     <CommandList>
                       <CommandEmpty>No se encontraron resultados.</CommandEmpty>
                       <CommandGroup>
